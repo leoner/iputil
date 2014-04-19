@@ -1,0 +1,40 @@
+{
+  "expr": true,
+  "eqeqeq": true,
+  "eqnull": true,
+  "indent": 2,
+  "latedef": "nofunc",
+  "newcap": true,
+  "quotmark": true,
+  "trailing": true,
+  "undef": true,
+  "unused": true,
+  "lastsemic": true,
+  "boss": true,
+  "funcscope": true,
+  "loopfunc": true,
+  "smarttabs": true,
+  "sub": true,
+  "esnext": true,
+  "node": true,
+  "noyield": true,
+  "laxbreak": true,
+  "noyield": true,
+
+  // Custom Global
+  "globals": {
+    // Mocha
+    "describe": false,
+    "xdescribe": false,
+    "it": false,
+    "xit": false,
+    "before": false,
+    "beforeEach": false,
+    "after": false,
+    "afterEach": false,
+    "define": false,
+    "window": false,
+    "seajs": false,
+    "document": false
+  }
+}

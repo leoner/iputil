@@ -1,0 +1,32 @@
+{
+  "name": "iputil",
+  "version": "0.0.1",
+  "description": "Ip location query.",
+  "dependencies": {
+    "debug": "0.8.0",
+    "iconv-lite": "0.2.11"
+  },
+  "devDependencies": {
+    "autod": "*",
+    "contributors": "*",
+    "cov": "*",
+    "istanbul-harmony": "*",
+    "jshint": "*",
+    "mocha": "*",
+    "should": "3.2.0"
+  },
+  "main": "index",
+  "scripts": {
+    "test": "make test"
+  },
+  "config": {
+    "alicov": {
+      "threshold": 100
+    }
+  },
+  "homepage": "https://github.com/leoner/iputil",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:leoner/iputil.git"
+  }
+}
