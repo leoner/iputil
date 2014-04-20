@@ -32,4 +32,6 @@ ipUtil_gbk.getIpInfo('1.12.0.0').province; // 北京
 ipUtil_gbk.getIpInfo('1.12.0.0').city; // 北京 ;
 
 ```
-   
+
+### 注意
+用到了 es6 的生成器, 所以需要使用 node 0.11.x 以上的版本.

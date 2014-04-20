@@ -25,7 +25,7 @@ IpUtil.prototype.init = function() {
     debug('not found ip file!');
     return;
   }
-  
+
   var ipMap = this.ipMap = {};
 
   var getLine = readLine(this.ipFile, this.filter);
@@ -69,19 +69,19 @@ IpUtil.prototype.init = function() {
       province = 'IANA';
       city = 'IANA';
     }
-            
+
     if ('局域网' === country) {
       country = '局域网';
       province = '局域网';
       city = '局域网';
     }
-            
+
     if('国外' === country) {
       country = '国外';
       province = '国外';
       city = '国外';
     }
-            
+
     if('中国' === country && ('中国' === province || '中国' === city)) {
       country = '中国';
       province = '中国';
