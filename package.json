@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "autod": "*",
+    "benchmark": "*",
     "contributors": "*",
     "cov": "*",
     "istanbul-harmony": "*",
