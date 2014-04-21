@@ -100,7 +100,7 @@ IpUtil.prototype.init = function() {
 
     result = getLine.next();
   }
-//console.info('--->', this.ipMap)
+//debug(this.ipMap)
   debug('完成IP库的载入. 共载入 %d 条IP纪录', this.starts.length);
   this.starts.sort(function(a, b) {
     return a - b;
@@ -131,10 +131,10 @@ IpUtil.prototype.getIpInfo = function(ip) {
   }
 
   var ipStart = this.locatStartIP(ip);
-
+  debug('开始获取 ip 信息: %d', ipStart);
   var ipInfo = this.ipMap[ipStart];
 
-  debug('查找IP, %s, ', long2IP(ip));
+  debug('查找IP, %s 成功.', long2IP(ip));
 
   if (ipInfo.endIp < ip) {
     debug('在IP库中找不到IP[%s]', long2IP(ip));
@@ -151,11 +151,11 @@ IpUtil.prototype.refreshData = function() {
 /**
  * 查找ip对应的开始IP地址。如果IP库中正好有以该ip开始的IP信息，那么就是返回这个ip。
  * 如果没有，则应该是比这个ip小的最大的start
- * 
  * @param ip
  * @return
 */
 IpUtil.prototype.locatStartIP = function(ip) {
+  debug('开始查找IP: %d', ip);
   var centerIP = 0;
   var centerIndex = 0; // 当前指针位置
   var startIndex = 0; // 起始位置
