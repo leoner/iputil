@@ -5,3 +5,4 @@ trace.*.log
 npm-debug.log
 .logs/
 sea-modules/
+ip.dat
