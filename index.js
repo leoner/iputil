@@ -2,11 +2,13 @@ var fs = require('fs');
 var join = require('path').join;
 var iconv = require('iconv-lite');
 var debug = require('debug')('ip');
+var util = require('util');
+var EventEmitter = require('events').EventEmitter;
 
 
 function IpUtil(ipFile, encoding) {
   this.ipFile = joinDirectory(process.cwd(), ipFile);
-  this.starts = [];
+  this.ipList = [];
   if (encoding && encoding.toLowerCase().indexOf('utf') > -1) {
     this.filter = function(buf) {
       return buf.toString();
@@ -19,26 +21,49 @@ function IpUtil(ipFile, encoding) {
   this.init();
 }
 
+util.inherits(IpUtil, EventEmitter);
+
 IpUtil.prototype.init = function() {
+  var that = this;
+
   debug('begin parse ipfile %s', this.ipFile);
   if (!fs.existsSync(this.ipFile)) {
     debug('not found ip file!');
+    that.emit('error');
     return;
   }
 
   var ipMap = this.ipMap = {};
+  var ipList = this.ipList;
 
   var getLine = readLine(this.ipFile, this.filter);
   var result = getLine.next();
   var line;
   var lineNum = 0;
-  while(!result.done) {
+
+  var counter = 1;
+  var loaded = false;
+  var _readLine = function () {
+    if (result.done) {
+      loaded = true;
+      return;
+    }
+
+    if (counter % 100000 === 0) {
+      counter = 1;
+      setImmediate(_readLine);
+      return;
+    }
+
+    counter++;
     lineNum++;
 
     line = result.value;
 
     if (!line || !line.trim()) {
-      continue;
+      result = getLine.next();
+      _readLine();
+      return;
     }
 
     var tokens = line.split(',', 6);
@@ -46,15 +71,18 @@ IpUtil.prototype.init = function() {
     if (tokens.length !== 6) {
       debug('第%d行格式不正确: %s', lineNum, line);
       result = getLine.next();
-      continue;
+      _readLine();
+      return;
     }
+
     var startIp = ip2Long(tokens[0]);
     var endIp = ip2Long(tokens[1]);
 
     if (!startIp || !endIp) {
       debug('第%d行格式不正确: %s', lineNum, line);
       result = getLine.next();
-      continue;
+      _readLine();
+      return;
     }
 
     var country = getValue(tokens[2]);
@@ -96,16 +124,34 @@ IpUtil.prototype.init = function() {
       city: city,
       address: address
     };
-    this.starts.push(startIp);
+    ipList.push(startIp);
 
     result = getLine.next();
-  }
-//debug(this.ipMap)
-  debug('完成IP库的载入. 共载入 %d 条IP纪录', this.starts.length);
-  this.starts.sort(function(a, b) {
-    return a - b;
-  });
-  debug('ip 索引排序完成.');
+
+    setImmediate(function() {
+      _readLine();
+    });
+  };
+
+  _readLine();
+
+  var sortIp = function () {
+    if (loaded) {
+      //debug(this.ipMap)
+      debug('完成IP库的载入. 共载入 %d 条IP纪录', ipList.length);
+      ipList.sort(function(a, b) {
+        return a - b;
+      });
+      debug('ip 索引排序完成.');
+      that.emit('done');
+    } else {
+      setTimeout(function() {
+        sortIp();
+      }, 10);
+    }
+  };
+
+  sortIp();
 };
 
 function getValue(val) {
@@ -159,14 +205,14 @@ IpUtil.prototype.locatStartIP = function(ip) {
   var centerIP = 0;
   var centerIndex = 0; // 当前指针位置
   var startIndex = 0; // 起始位置
-  var endIndex = this.starts.length - 1; // 结束位置
+  var endIndex = this.ipList.length - 1; // 结束位置
   var count = 0; // 循环次数
 
   while (true) {
     debug('%d. start = %d, end = %d', count++, startIndex, endIndex);
     // 中间位置
     centerIndex = Math.floor((startIndex + endIndex) / 2);
-    centerIP = this.starts[centerIndex];
+    centerIP = this.ipList[centerIndex];
     if (centerIP < ip) {
       // 如果中间位置的IP小于要查询的IP，那么下一次查找后半段
       startIndex = centerIndex;
@@ -182,7 +228,7 @@ IpUtil.prototype.locatStartIP = function(ip) {
       // 如果开始指针和结束指针相差只有1，那么说明IP库中没有正好以该ip开始的IP信息
       // 只能返回IP信息的start ip比这个ip小的最大的那条IP信息的start ip
       if (centerIP > ip) {
-        centerIP = this.starts[centerIndex - 1];
+        centerIP = this.ipList[centerIndex - 1];
       }
       break;
     }

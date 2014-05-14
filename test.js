@@ -34,8 +34,11 @@ describe('ipUtil utils method', function () {
 
 describe('find ip info, gbk', function() {
   var ipUtil;
-  before(function() {
+  before(function(done) {
     ipUtil = new IpUtil('ip-gbk.txt');
+    ipUtil.on('done', function() {
+      done();
+    });
   });
 
   it('getIPInfo()', function() {
@@ -47,8 +50,11 @@ describe('find ip info, gbk', function() {
 
 describe('find ip info, utf8', function() {
   var ipUtil;
-  before(function() {
+  before(function(done) {
     ipUtil = new IpUtil('ip-utf8.txt', 'utf8');
+    ipUtil.on('done', function() {
+      done();
+    });
   });
 
   it('getIPInfo()', function() {
