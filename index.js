@@ -49,11 +49,13 @@ IpUtil.prototype.init = function() {
       return;
     }
 
+    /**
     if (counter % 100000 === 0) {
       counter = 1;
       setImmediate(_readLine);
       return;
     }
+    **/
 
     counter++;
     lineNum++;
