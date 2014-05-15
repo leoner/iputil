@@ -29,7 +29,7 @@ IpUtil.prototype.init = function() {
   debug('begin parse ipfile %s', this.ipFile);
   if (!fs.existsSync(this.ipFile)) {
     debug('not found ip file!');
-    that.emit('error');
+    that.emit('error', 'ipfile_not_found');
     return;
   }
 
@@ -42,10 +42,9 @@ IpUtil.prototype.init = function() {
   var lineNum = 0;
 
   var counter = 1;
-  var loaded = false;
   var _readLine = function () {
     if (result.done) {
-      loaded = true;
+      that.emit('loaded');
       return;
     }
 
@@ -135,22 +134,16 @@ IpUtil.prototype.init = function() {
   _readLine();
 
   var sortIp = function () {
-    if (loaded) {
-      //debug(this.ipMap)
-      debug('完成IP库的载入. 共载入 %d 条IP纪录', ipList.length);
-      ipList.sort(function(a, b) {
-        return a - b;
-      });
-      debug('ip 索引排序完成.');
-      that.emit('done');
-    } else {
-      setTimeout(function() {
-        sortIp();
-      }, 10);
-    }
+    //debug(this.ipMap)
+    debug('完成IP库的载入. 共载入 %d 条IP纪录', ipList.length);
+    ipList.sort(function(a, b) {
+      return a - b;
+    });
+    debug('ip 索引排序完成.');
+    that.emit('done');
   };
 
-  sortIp();
+  this.on('loaded', sortIp);
 };
 
 function getValue(val) {
