@@ -29,7 +29,7 @@ IpUtil.prototype.init = function() {
   debug('begin parse ipfile %s', this.ipFile);
   if (!fs.existsSync(this.ipFile)) {
     debug('not found ip file!');
-    that.emit('error', 'ipfile_not_found');
+    that.emit('error', new Error('ipfile_not_found'));
     return;
   }
 
