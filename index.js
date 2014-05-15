@@ -49,15 +49,14 @@ IpUtil.prototype.init = function() {
       return;
     }
 
-    /**
+    // 避免ip读取独占cpu.
     if (counter % 100000 === 0) {
       counter = 1;
       setImmediate(_readLine);
       return;
     }
-    **/
-
     counter++;
+
     lineNum++;
 
     line = result.value;
@@ -130,9 +129,7 @@ IpUtil.prototype.init = function() {
 
     result = getLine.next();
 
-    setImmediate(function() {
-      _readLine();
-    });
+    process.nextTick(_readLine);
   };
 
   _readLine();
