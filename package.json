@@ -1,6 +1,6 @@
 {
   "name": "iputil",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Ip location query.",
   "dependencies": {
     "debug": "0.8.0",

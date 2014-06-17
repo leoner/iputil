@@ -128,7 +128,7 @@ IpUtil.prototype.init = function() {
 
     result = getLine.next();
 
-    process.nextTick(_readLine);
+    setImmediate(_readLine);
   };
 
   _readLine();
