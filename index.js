@@ -6,7 +6,12 @@ var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 var thunkify = require('thunkify-wrap');
 
-function IpUtil(ipFile, encoding) {
+function IpUtil(ipFile, encoding, isLoad) {
+  if (typeof encoding === 'function') {
+    isLoad = encoding;
+    encoding = null;
+  }
+
   this.ipFile = joinDirectory(process.cwd(), ipFile);
   this.ipList = [];
   if (encoding && encoding.toLowerCase().indexOf('utf') > -1) {
@@ -18,6 +23,11 @@ function IpUtil(ipFile, encoding) {
       return iconv.decode(new Buffer(buf), 'gbk');
     };
   }
+
+  this.isLoad = isLoad || function(){
+    return true;
+  };
+
   this.init();
 }
 
@@ -25,6 +35,7 @@ util.inherits(IpUtil, EventEmitter);
 
 IpUtil.prototype.init = function() {
   var that = this;
+  var isLoad = this.isLoad;
 
   debug('begin parse ipfile %s', this.ipFile);
   if (!fs.existsSync(this.ipFile)) {
@@ -114,6 +125,12 @@ IpUtil.prototype.init = function() {
       country = '中国';
       province = '中国';
       city = '中国';
+    }
+
+    if (!isLoad(country, province, city)) {
+      result = getLine.next();
+      setImmediate(_readLine);
+      return;
     }
 
     ipMap[startIp] = {
@@ -320,8 +337,8 @@ module.exports = IpUtil;
 module.exports.isIP = isIp;
 module.exports.ip2Long = ip2Long;
 module.exports.long2Ip = long2IP;
-module.exports.getIpUtil = function *(ipFile, encoding) {
-  var iputil = new IpUtil(ipFile, encoding);
+module.exports.getIpUtil = function *(ipFile, encoding, ipFilter) {
+  var iputil = new IpUtil(ipFile, encoding, ipFilter);
   var end = thunkify.event(iputil, ['done', 'error']);
   yield end();
   return iputil;

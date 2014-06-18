@@ -99,3 +99,29 @@ describe('test generator not found file.', function() {
     (ipUtil === null).should.be.ok;
   });
 });
+
+describe('test loading the foreign ip address.', function() {
+  var ipUtil;
+  before(function(done) {
+    ipUtil = new IpUtil('ip-gbk.txt', function(country) {
+      if (country === '中国') {
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    ipUtil.on('done', function() {
+      done();
+    });
+  });
+
+  it('国内 ip 返回都为空.', function() {
+    (ipUtil.getIpInfo('10.1.1.1') === null).should.be.ok;
+    (ipUtil.getIpInfo('1.26.6.0') === null).should.be.ok;
+    (ipUtil.getIpInfo('1.194.184.0') === null).should.be.ok;
+
+    ipUtil.getIpInfo('1.0.0.0').country.should.equal('澳大利亚');
+    ipUtil.getIpInfo('1.1.64.0').country.should.equal('日本');
+  });
+});
