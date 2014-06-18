@@ -1,10 +1,11 @@
 {
   "name": "iputil",
-  "version": "0.0.3",
+  "version": "0.1.1",
   "description": "Ip location query.",
   "dependencies": {
     "debug": "0.8.0",
-    "iconv-lite": "0.2.11"
+    "iconv-lite": "0.2.11",
+    "thunkify-wrap": "~0.1.2"
   },
   "devDependencies": {
     "autod": "*",
@@ -14,7 +15,8 @@
     "istanbul-harmony": "*",
     "jshint": "*",
     "mocha": "*",
-    "should": "3.2.0"
+    "should": "3.2.0",
+    "co": "~3.0.6"
   },
   "main": "index",
   "scripts": {

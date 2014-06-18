@@ -1,6 +1,7 @@
 'use strict';
 
 var IpUtil = require('./index.js');
+var co = require('co');
 var isIp = IpUtil.isIP;
 
 describe('ipUtil utils method', function () {
@@ -61,5 +62,40 @@ describe('find ip info, utf8', function() {
     (ipUtil.getIpInfo('10.1.1.1') === null).should.be.ok;
     (ipUtil.getIpInfo('10.1.') === null).should.be.ok;
     ipUtil.getIpInfo('1.26.6.0').city.should.be.eql('呼伦贝尔');
+  });
+});
+
+
+describe('test generator', function() {
+  var ipUtil;
+  before(function(done) {
+    co(function*(){
+      ipUtil = yield IpUtil.getIpUtil('ip-utf8.txt', 'utf8');
+      done();
+    })();
+  });
+
+  it('getIPInfo()', function() {
+    (ipUtil.getIpInfo('10.1.1.1') === null).should.be.ok;
+    (ipUtil.getIpInfo('10.1.') === null).should.be.ok;
+    ipUtil.getIpInfo('1.26.6.0').city.should.be.eql('呼伦贝尔');
+  });
+});
+
+describe('test generator not found file.', function() {
+  var ipUtil;
+  before(function(done) {
+    co(function* (){
+      try {
+        ipUtil = yield IpUtil.getIpUtil('ip-utf81.txt', 'utf8');
+      } catch(e) {
+        ipUtil = null;
+      }
+      done();
+    })();
+  });
+
+  it('ipUtil is null.', function() {
+    (ipUtil === null).should.be.ok;
   });
 });

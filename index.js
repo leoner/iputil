@@ -4,7 +4,7 @@ var iconv = require('iconv-lite');
 var debug = require('debug')('ip');
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
-
+var thunkify = require('thunkify-wrap');
 
 function IpUtil(ipFile, encoding) {
   this.ipFile = joinDirectory(process.cwd(), ipFile);
@@ -29,7 +29,7 @@ IpUtil.prototype.init = function() {
   debug('begin parse ipfile %s', this.ipFile);
   if (!fs.existsSync(this.ipFile)) {
     debug('not found ip file!');
-    that.emit('error', new Error('ipfile_not_found'));
+    that.emit('error', 'ipfile_not_found');
     return;
   }
 
@@ -128,7 +128,7 @@ IpUtil.prototype.init = function() {
 
     result = getLine.next();
 
-    process.nextTick(_readLine);
+    setImmediate(_readLine);
   };
 
   _readLine();
@@ -320,3 +320,9 @@ module.exports = IpUtil;
 module.exports.isIP = isIp;
 module.exports.ip2Long = ip2Long;
 module.exports.long2Ip = long2IP;
+module.exports.getIpUtil = function *(ipFile, encoding) {
+  var iputil = new IpUtil(ipFile, encoding);
+  var end = thunkify.event(iputil, ['done', 'error']);
+  yield end();
+  return iputil;
+};
